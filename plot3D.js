@@ -133,10 +133,12 @@ function Application(canvas, gl) {
           0, 150,   0];
 
 	this.translation = [-150, 0, -360];
-	this.rotation = [this.util.degToRad(190), this.util.degToRad(40), this.util.degToRad(320)];
+	this.rotation = [this.util.degToRad(0), this.util.degToRad(0), this.util.degToRad(180)];
 	this.scale = [1, 1, 1];
 
-	this.cameraZ = 100;
+	this.cameraPos = [0, 0, 50];
+	this.cameraFront = [0, 0, -1];
+	this.cameraUp = [0, 0, 1];
 	this.cameraAngleRadians = this.util.degToRad(0);
 	this.fieldOfViewRadians = this.util.degToRad(60);
 
@@ -169,10 +171,9 @@ function Application(canvas, gl) {
 		//this.scale[1] += delta * 1.1;
 		//this.translation[0] += delta * 2;
 		//this.translation[2] -= delta;
-		//this.rotation[1] += 3.14 * 1/360 * delta;
+		this.rotation[1] += 3.14 * 1/360 * delta;
 		//this.rotation[1] %= 6.28;
 		//this.cameraAngleRadians += this.util.degToRad(delta);
-		this.cameraZ += delta;
 	}
 
 	this.render = function() {
@@ -206,20 +207,8 @@ function Application(canvas, gl) {
 
 		gl.uniform4fv(this.colorLocation, this.color);
 
-		var cameraMatrix = this.util.m4.yRotation(this.cameraAngleRadians);
-	    cameraMatrix = this.util.m4.translate(cameraMatrix, 0, 0, this.cameraZ);
-
-		// Get the camera's postion from the matrix we computed
-		var cameraPosition = [
-		  cameraMatrix[12],
-		  cameraMatrix[13],
-		  cameraMatrix[14],
-		];
-
-    	var up = [0, 1, 0];
-
 		// Compute the camera's matrix using look at.
-		var cameraMatrix = this.util.m4.lookAt(cameraPosition, [0, 0, 0], up);
+		var cameraMatrix = this.util.m4.lookAt(this.cameraPos, [0, 0, 0], this.cameraUp);
 
 		// Make a view matrix from the camera matrix
 		var viewMatrix = this.util.m4.inverse(cameraMatrix);
@@ -243,6 +232,12 @@ function Application(canvas, gl) {
 		var offset = 0;
 		var count = 16 * 6;
 		gl.drawArrays(primitiveType, offset, count);
+	}
+
+	this.translateCamera = function(dx, dy, dz) {
+		this.cameraPos[0] += dx;
+		this.cameraPos[1] += dy;
+		this.cameraPos[2] += dz;
 	}
 
 	function Util() {
@@ -594,3 +589,16 @@ function start() {
 	lastRender = 0;
 	window.requestAnimationFrame(run);
 }
+
+function keydown(e) {
+	var code = e.keyCode;
+	switch (code) {
+		case 65: app.translateCamera(-1, 0, 0); break; //Left key
+		case 87: app.translateCamera(0, 1, 0); break; //Up key
+		case 68: app.translateCamera(1, 0, 0); break; //Right key
+		case 83: app.translateCamera(0, -1, 0); break; //Down key
+		default: console.log(code); //Everything else
+	}
+}
+
+window.addEventListener('keydown', this.keydown, false);
