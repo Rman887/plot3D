@@ -5,118 +5,208 @@ function Application(canvas, gl) {
 	this.util = new Util();
 	this.program;
 
-	this.positions = [
-		// left column
-		0,   0,  0,
-		30,   0,  0,
-		0, 150,  0,
-		0, 150,  0,
-		30,   0,  0,
-		30, 150,  0,
+	this.positions = [0,   0,  0,
+           30,   0,  0,
+            0, 150,  0,
+            0, 150,  0,
+           30,   0,  0,
+           30, 150,  0,
 
-		// top rung
-		30,   0,  0,
-		100,   0,  0,
-		30,  30,  0,
-		30,  30,  0,
-		100,   0,  0,
-		100,  30,  0,
+          // top rung front
+           30,   0,  0,
+          100,   0,  0,
+           30,  30,  0,
+           30,  30,  0,
+          100,   0,  0,
+          100,  30,  0,
 
-		// middle rung
-		30,  60,  0,
-		67,  60,  0,
-		30,  90,  0,
-		30,  90,  0,
-		67,  60,  0,
-		67,  90,  0]
-		this.positionBuffer;
-		this.positionAttributeLocation;
+          // middle rung front
+           30,  60,  0,
+           67,  60,  0,
+           30,  90,  0,
+           30,  90,  0,
+           67,  60,  0,
+           67,  90,  0,
 
-		this.setup = function() {
-			var vertexShader = this.util.createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
-			var fragmentShader = this.util.createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
-			this.program = this.util.createProgram(gl, vertexShader, fragmentShader);
+          // left column back
+            0,   0,  30,
+           30,   0,  30,
+            0, 150,  30,
+            0, 150,  30,
+           30,   0,  30,
+           30, 150,  30,
 
-			this.colorLocation = gl.getUniformLocation(this.program, "u_color");
-			this.matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
-			this.positionAttributeLocation = gl.getAttribLocation(this.program, "a_position");
+          // top rung back
+           30,   0,  30,
+          100,   0,  30,
+           30,  30,  30,
+           30,  30,  30,
+          100,   0,  30,
+          100,  30,  30,
 
-			this.positionBuffer = gl.createBuffer();
-			gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.positions), gl.STATIC_DRAW);
-		}
+          // middle rung back
+           30,  60,  30,
+           67,  60,  30,
+           30,  90,  30,
+           30,  90,  30,
+           67,  60,  30,
+           67,  90,  30,
 
-		this.update = function() {
-			this.translation = [45, 150, 0];
-			this.rotation = [3.14 * 2/9, 3.14 * 1/6, 3.14 * 5/6];
-			this.scale = [1, 1, 1];
-			this.color = [Math.random(), Math.random(), Math.random(), 1];
-		}
+          // top
+            0,   0,   0,
+          100,   0,   0,
+          100,   0,  30,
+            0,   0,   0,
+          100,   0,  30,
+            0,   0,  30,
 
-		this.render = function() {
-			this.util.resize(canvas);
-			gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+          // top rung right
+          100,   0,   0,
+          100,  30,   0,
+          100,  30,  30,
+          100,   0,   0,
+          100,  30,  30,
+          100,   0,  30,
 
-			// Clear the canvas
-			gl.clearColor(0, 0, 0, 0);
-			gl.clear(gl.COLOR_BUFFER_BIT);
+          // under top rung
+          30,   30,   0,
+          30,   30,  30,
+          100,  30,  30,
+          30,   30,   0,
+          100,  30,  30,
+          100,  30,   0,
 
-			gl.useProgram(this.program);
-			gl.enableVertexAttribArray(this.positionAttributeLocation);
+          // between top rung and middle
+          30,   30,   0,
+          30,   30,  30,
+          30,   60,  30,
+          30,   30,   0,
+          30,   60,  30,
+          30,   60,   0,
 
+          // top of middle rung
+          30,   60,   0,
+          30,   60,  30,
+          67,   60,  30,
+          30,   60,   0,
+          67,   60,  30,
+          67,   60,   0,
 
-			var primitiveType = gl.TRIANGLES;
-			var offset = 0;
-			var count = 3;
-			gl.drawArrays(primitiveType, offset, count);
+          // right of middle rung
+          67,   60,   0,
+          67,   60,  30,
+          67,   90,  30,
+          67,   60,   0,
+          67,   90,  30,
+          67,   90,   0,
 
-			// Bind the position buffer.
-			gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
+          // bottom of middle rung.
+          30,   90,   0,
+          30,   90,  30,
+          67,   90,  30,
+          30,   90,   0,
+          67,   90,  30,
+          67,   90,   0,
 
-			// Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-			var size = 3;          // 2 components per iteration
-			var type = gl.FLOAT;   // the data is 32bit floats
-			var normalize = false; // don't normalize the data
-			var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-			var offset = 0;        // start at the beginning of the buffer
-			gl.vertexAttribPointer(this.positionAttributeLocation, size, type, normalize, stride, offset);
+          // right of bottom
+          30,   90,   0,
+          30,   90,  30,
+          30,  150,  30,
+          30,   90,   0,
+          30,  150,  30,
+          30,  150,   0,
 
-			gl.uniform4fv(colorLocation, color);
+          // bottom
+          0,   150,   0,
+          0,   150,  30,
+          30,  150,  30,
+          0,   150,   0,
+          30,  150,  30,
+          30,  150,   0,
 
-			var matrix = m4.projection(gl.canvas.clientWidth, gl.canvas.clientHeight, 400);
-			matrix = m4.translate(matrix, translation[0], translation[1], translation[2]);
-			matrix = m4.xRotate(matrix, rotation[0]);
-			matrix = m4.yRotate(matrix, rotation[1]);
-			matrix = m4.zRotate(matrix, rotation[2]);
-			matrix = m4.scale(matrix, scale[0], scale[1], scale[2]);
+          // left side
+          0,   0,   0,
+          0,   0,  30,
+          0, 150,  30,
+          0,   0,   0,
+          0, 150,  30,
+          0, 150,   0];
+	this.translation = [45, 150, 1];
+	this.rotation = [3.14/180 * 120, 3.14/180 * 120, 3.14/180 * 0];
+	this.rotation = [0, 0, 0];
+	this.scale = [1, 1, 1];
+	this.color = [Math.random(), Math.random(), Math.random(), 1];
 
-			gl.uniformMatrix4fv(this.matrixLocation, false, matrix);
+	this.positionBuffer;
+	this.positionAttributeLocation;
 
-			var primitiveType = gl.TRIANGLES;
-			var offset = 0;
-			var count = 3;
-			gl.drawArrays(primitiveType, offset, count);
-		}
+	this.colorLocation;
+	this.matrixLocation;
+	this.positionAttributeLocation;
+
+	this.setup = function() {
+		var vertexShader = this.util.createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+		var fragmentShader = this.util.createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
+		this.program = this.util.createProgram(gl, vertexShader, fragmentShader);
+
+		this.colorLocation = gl.getUniformLocation(this.program, "u_color");
+		this.matrixLocation = gl.getUniformLocation(this.program, "u_matrix");
+		this.positionAttributeLocation = gl.getAttribLocation(this.program, "a_position");
+
+		this.positionBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.positions), gl.STATIC_DRAW);
+
+		gl.enable(gl.DEPTH_TEST);
 	}
 
-	function start() {
-		var canvas = document.getElementById("canvas");
-		var gl = canvas.getContext("webgl2");
-		if (!gl) {
-			console.log("WebGL2 not available, using WebGL1")
-			gl = canvas.getContext("webgl");
+	this.update = function(delta) {
+		//this.scale[0] += delta * 1.1;
+		//this.scale[1] += delta * 1.1;
+		//this.scale[1] += delta * 1.1;
+		//this.translation[0] = 150;
+		//this.translation[2] -= delta;
+		//this.rotation[1] += 3.14 * 1/360 * delta;
+		//this.rotation[1] %= 6.28;
+	}
 
-			if (!gl) {
-				console.log("WebGL1 not available");
-				canvas.innerHTML = "WebGL not available";
-			}
-		}
+	this.render = function() {
+		this.util.resize(canvas);
+		gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-		var app = new Application(canvas, gl);
-		app.setup();
+		// Clear the canvas
+		gl.clearColor(0, 0, 0, 0);
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-		app.update();
-		app.render();
+		gl.useProgram(this.program);
+		gl.enableVertexAttribArray(this.positionAttributeLocation);
+
+		// Bind the position buffer.
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
+
+		// Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
+		var size = 3;          // 2 components per iteration
+		var type = gl.FLOAT;   // the data is 32bit floats
+		var normalize = false; // don't normalize the data
+		var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
+		var offset = 0;        // start at the beginning of the buffer
+		gl.vertexAttribPointer(this.positionAttributeLocation, size, type, normalize, stride, offset);
+
+		gl.uniform4fv(this.colorLocation, this.color);
+
+		var matrix = this.util.m4.projection(gl.canvas.clientWidth, gl.canvas.clientHeight, 400);
+		matrix = this.util.m4.translate(matrix, this.translation[0], this.translation[1], this.translation[2]);
+		matrix = this.util.m4.xRotate(matrix, this.rotation[0]);
+		matrix = this.util.m4.yRotate(matrix, this.rotation[1]);
+		matrix = this.util.m4.zRotate(matrix, this.rotation[2]);
+		matrix = this.util.m4.scale(matrix, this.scale[0], this.scale[1], this.scale[2]);
+
+		gl.uniformMatrix4fv(this.matrixLocation, false, matrix);
+
+		var primitiveType = gl.TRIANGLES;
+		var offset = 0;
+		var count = 16 * 6;
+		gl.drawArrays(primitiveType, offset, count);
 	}
 
 	function Util() {
@@ -162,7 +252,7 @@ function Application(canvas, gl) {
 			}
 		}
 
-		var m4 = {
+		this.m4 = {
 			projection: function(width, height, depth) {
 				// Note: This matrix flips the Y axis so 0 is at the top.
 				return [
@@ -280,23 +370,52 @@ function Application(canvas, gl) {
 			},
 
 			translate: function(m, tx, ty, tz) {
-				return m4.multiply(m, m4.translation(tx, ty, tz));
+				return this.multiply(m, this.translation(tx, ty, tz));
 			},
 
 			xRotate: function(m, angleInRadians) {
-				return m4.multiply(m, m4.xRotation(angleInRadians));
+				return this.multiply(m, this.xRotation(angleInRadians));
 			},
 
 			yRotate: function(m, angleInRadians) {
-				return m4.multiply(m, m4.yRotation(angleInRadians));
+				return this.multiply(m, this.yRotation(angleInRadians));
 			},
 
 			zRotate: function(m, angleInRadians) {
-				return m4.multiply(m, m4.zRotation(angleInRadians));
+				return this.multiply(m, this.zRotation(angleInRadians));
 			},
 
 			scale: function(m, sx, sy, sz) {
-				return m4.multiply(m, m4.scaling(sx, sy, sz));
+				return this.multiply(m, this.scaling(sx, sy, sz));
 			}
 		};
 	}
+}
+
+var app;
+var lastRender;
+var targetFPS = 60;
+
+function run(timestamp) {
+	var progress = timestamp - lastRender;
+	var delta = progress / (1000.0 / targetFPS);
+	app.update(delta);
+	app.render();
+	lastRender = timestamp;
+	window.requestAnimationFrame(run);
+}
+
+function start() {
+	var canvas = document.getElementById("canvas");
+	var gl = canvas.getContext("webgl");
+	if (!gl) {
+		console.log("WebGL1 not available");
+		canvas.innerHTML = "WebGL not available";
+	}
+
+	app = new Application(canvas, gl);
+	app.setup();
+
+	lastRender = 0;
+	window.requestAnimationFrame(run);
+}
